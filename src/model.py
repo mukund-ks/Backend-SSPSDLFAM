@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from modules import ASPPModule, DecoderModule, SEModule
-from torchsummary import summary
 from typing import Any
 
 
@@ -19,7 +18,7 @@ class DeepLabV3Plus(nn.Module):
 
         # Dilation Rates
         dilations = [6, 12, 18, 24]
-        
+
         # ASPP Module
         self.aspp = ASPPModule(in_channels, out_channels, dilations)
 
@@ -85,4 +84,3 @@ if __name__ == "__main__":
     # Forward pass
     output = model(random_input)
     print("Output shape:", output.shape)
-    summary(model, input_size=(3, 256, 256))
