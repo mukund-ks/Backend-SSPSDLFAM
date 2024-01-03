@@ -5,7 +5,8 @@ import albumentations as A
 from PIL import Image
 from io import BytesIO
 from albumentations.pytorch import ToTensorV2
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -29,7 +30,7 @@ class PredResponse(BaseModel):
     prediction: str
 
 
-async def make_prediction(img_arr):
+async def make_prediction(img_arr: np.ndarray[np.uint8]):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = DeepLabV3Plus(num_classes=1)
@@ -45,15 +46,17 @@ async def make_prediction(img_arr):
         ]
     )
 
-    img_arr /= 255.0
+    img_thres = (img_arr / 255).astype(np.uint8)
 
-    augmentations = transformations(image=img_arr)
+    augmentations = transformations(image=img_thres)
     image = augmentations["image"]
     image = image.to(device)
+    image = image.unsqueeze(0) # Add batch dimension
 
     output = model(image)
-    prediction = output.cpu().numpy()[0, 0]
+    prediction = output.cpu().detach().numpy()[0, 0]
     prediction = np.expand_dims(prediction, axis=-1)
+    prediction = (prediction > 0.5).astype(np.uint8)
 
     pred_bytes = (prediction * 255).astype(np.uint8).tobytes()
 
@@ -68,14 +71,22 @@ async def predict(payload: PredRequest):
         image_data = base64.b64decode(payload.img_base64)
 
         with Image.open(BytesIO(image_data)) as pil_img:
-            img_arr = np.array(pil_img)
+            img_arr = np.array(pil_img.convert("RGB"), dtype=np.uint8)
 
-        pred_res = make_prediction(img_arr)
+        pred_res = await make_prediction(img_arr)
 
-        return {"prediction": pred_res}
+        return JSONResponse(status_code=200, content={"prediction": pred_res})
     except Exception as e:
         print(f"Error in make_prediction: {str(e)}")
-        return HTTPException(status_code=500, detail="Error during model prediction.")
+        raise HTTPException(
+            status_code=500,
+            detail="Error during model prediction",
+        )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(status_code=exc.status_code, content={"message": f"{exc.detail}"})
 
 
 @app.get("/")
