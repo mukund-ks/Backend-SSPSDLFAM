@@ -96,5 +96,5 @@ No authentication is currently required for this API.
 ## Contributing
 Contributions are welcomed! Feel free to submit issues, feature requests, or pull requests.
 
-> ![NOTE]
+> [!NOTE]  
 > This project is part of the Capstone Project for college.
