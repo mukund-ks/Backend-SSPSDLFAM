@@ -65,7 +65,7 @@ async def make_prediction(img_arr: np.ndarray[np.float32]):
     return base64_pred
 
 
-@app.post("/predict", response_model=PredResponse)
+@app.post("/segment", response_model=PredResponse)
 async def predict(payload: PredRequest):
     try:
         image_data = base64.b64decode(payload.img_base64)
