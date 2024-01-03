@@ -160,3 +160,6 @@ cython_debug/
 #.idea/
 
 src/weights/
+test.py
+test_img.png
+predicted_image.png
