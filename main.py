@@ -30,7 +30,7 @@ class PredResponse(BaseModel):
     prediction: str
 
 
-async def make_prediction(img_arr: np.ndarray[np.uint8]):
+async def make_prediction(img_arr: np.ndarray[np.float32]):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = DeepLabV3Plus(num_classes=1)
@@ -46,12 +46,12 @@ async def make_prediction(img_arr: np.ndarray[np.uint8]):
         ]
     )
 
-    img_thres = (img_arr / 255).astype(np.uint8)
+    img_thres = img_arr.astype(np.float32) / 255.0
 
     augmentations = transformations(image=img_thres)
     image = augmentations["image"]
     image = image.to(device)
-    image = image.unsqueeze(0) # Add batch dimension
+    image = image.unsqueeze(0)  # Add batch dimension
 
     output = model(image)
     prediction = output.cpu().detach().numpy()[0, 0]
@@ -71,7 +71,7 @@ async def predict(payload: PredRequest):
         image_data = base64.b64decode(payload.img_base64)
 
         with Image.open(BytesIO(image_data)) as pil_img:
-            img_arr = np.array(pil_img.convert("RGB"), dtype=np.uint8)
+            img_arr = np.array(pil_img.convert("RGB"), dtype=np.float32)
 
         pred_res = await make_prediction(img_arr)
 
