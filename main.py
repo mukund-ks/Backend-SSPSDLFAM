@@ -27,7 +27,7 @@ class PredRequest(BaseModel):
 
 
 class PredResponse(BaseModel):
-    prediction: str
+    mask: str
 
 
 async def make_prediction(img_arr: np.ndarray[np.float32]):
@@ -75,7 +75,7 @@ async def predict(payload: PredRequest):
 
         pred_res = await make_prediction(img_arr)
 
-        return JSONResponse(status_code=200, content={"prediction": pred_res})
+        return JSONResponse(status_code=200, content={"mask": pred_res})
     except Exception as e:
         print(f"Error in make_prediction: {str(e)}")
         raise HTTPException(
