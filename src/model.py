@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
-from modules import ASPPModule, DecoderModule, SEModule
+from .modules import ASPPModule, DecoderModule, SEModule
 from typing import Any
 
 
