@@ -30,7 +30,7 @@ class PredResponse(BaseModel):
     mask: str
 
 
-async def make_prediction(img_arr: np.ndarray[np.float32]):
+async def run_model(img_arr: np.ndarray[np.float32]):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = DeepLabV3Plus(num_classes=1)
@@ -66,21 +66,21 @@ async def make_prediction(img_arr: np.ndarray[np.float32]):
 
 
 @app.post("/segment", response_model=PredResponse)
-async def predict(payload: PredRequest):
+async def segment(payload: PredRequest):
     try:
         image_data = base64.b64decode(payload.img_base64)
 
         with Image.open(BytesIO(image_data)) as pil_img:
             img_arr = np.array(pil_img.convert("RGB"), dtype=np.float32)
 
-        pred_res = await make_prediction(img_arr)
+        pred_res = await run_model(img_arr)
 
         return JSONResponse(status_code=200, content={"mask": pred_res})
     except Exception as e:
-        print(f"Error in make_prediction: {str(e)}")
+        print(f"Error in run_model: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail="Error during model prediction",
+            detail="Error during model run",
         )
 
 
