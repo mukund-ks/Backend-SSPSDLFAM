@@ -52,7 +52,7 @@ The API will be accessible at `http://localhost:8000`. Open your web browser or 
 - Parameters: 
 ```json
 {
-    "img_base64": "base54-encoded image string"
+    "img_base64": "base64-encoded image string"
 }
 ```
 
