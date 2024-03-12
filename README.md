@@ -69,9 +69,10 @@ Upon successfull processing, the API responds with a JSON object containing the 
 To test the API using Python, you can use the provided example script. The script loads an image, encodes it into base64, sends a POST request to the API's segmentation endpoint, and decodes the resulting base64-encoded segmentation mask.
 
 ```python
-from PIL import Image
 import requests
 import base64
+from io import BytesIO
+from PIL import Image
 
 img_size = (256,256) # H,W of input image
 
@@ -85,7 +86,7 @@ json_res = response.json()
 base64_mask = json_res["mask"]
 mask_bytes = base64.b64decode(base64_mask)
 
-mask_img = Image.frombytes("L", img_size, mask_bytes)
+mask_img = Image.open(BytesIO(mask_bytes))
 
 mask_img.save("mask.png", format="PNG")
 ```

@@ -30,6 +30,16 @@ class PredResponse(BaseModel):
     mask: str
 
 
+def bytesToBase64(pred_bytes: bytes):
+    output_buffer = BytesIO()
+
+    pred_img = Image.frombytes("L", (256, 256), pred_bytes)
+    pred_img.save(output_buffer, format="PNG")
+
+    pred_str = base64.b64encode(output_buffer.getvalue()).decode("utf-8")
+    return pred_str
+
+
 async def run_model(img_arr: np.ndarray[np.float32]):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -60,7 +70,7 @@ async def run_model(img_arr: np.ndarray[np.float32]):
 
     pred_bytes = (prediction * 255).astype(np.uint8).tobytes()
 
-    base64_pred = base64.b64encode(pred_bytes).decode("utf-8")  # .decode('utf-8') to convert to str
+    base64_pred = bytesToBase64(pred_bytes)
 
     return base64_pred
 
