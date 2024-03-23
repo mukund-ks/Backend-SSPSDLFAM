@@ -41,10 +41,12 @@ def bytesToBase64(pred_bytes: bytes):
 
 
 async def run_model(img_arr: np.ndarray[np.float32]):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")
 
     model = DeepLabV3Plus(num_classes=1)
-    model.load_state_dict(torch.load("src/weights/best_model.pth"))
+    model.load_state_dict(
+        torch.load("src/weights/best_model.pth", map_location=device)
+    )
     model.to(device)
     model.eval()
 

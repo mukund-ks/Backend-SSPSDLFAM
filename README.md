@@ -12,7 +12,8 @@ This API leverages DeepLabV3+ with a ResNet50 backbone to perform binary semanti
 - PIL
 - FastAPI
 - Uvicorn
-- PyTorch
+- Gunicorn
+- PyTorch 2.2.1
 
 ### Installation
 
@@ -42,9 +43,22 @@ pip install -r requirements.txt
 ### Runnning the API
 To start the FastAPI server, run the following command:
 ```bash
-uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 The API will be accessible at `http://localhost:8000`. Open your web browser or use tools like cURL or Postman to interact with API endpoints.
+
+#### Running through Docker
+
+- Build the Docker Image:
+  ```bash
+  docker build -t backend-sspsdlfam .
+  ```
+
+- Run the Docker Container:
+  ```bash
+  docker run -p 8000:8080 backend-sspsdlfam
+  ```
+  The API will be accessible at `http://localhost:8000`.
 
 ### Segmentation Endpoint
 - Method: POST
@@ -98,4 +112,4 @@ No authentication is currently required for this API.
 Contributions are welcomed! Feel free to submit issues, feature requests, or pull requests.
 
 > [!NOTE]  
-> This project is part of the Capstone Project for college.
+> This project is part of the Capstone Project (Team-34) for college.
