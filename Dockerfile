@@ -1,12 +1,16 @@
 FROM python:3.10.12-slim
 
-COPY . /app
+RUN pip install --upgrade pip
+
+RUN mkdir app
+
+COPY requirements.txt /app
 
 WORKDIR /app
 
-RUN pip install --upgrade pip
-
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 EXPOSE 8080
 
